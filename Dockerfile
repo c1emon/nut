@@ -16,7 +16,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     apk update --allow-untrusted && apk upgrade --allow-untrusted && \
     apk add --no-cache --allow-untrusted nut
 
-COPY files/startup.sh /startup.sh
+COPY startup.sh /startup.sh
 
 RUN [ -d /etc/nut ] && find /etc/nut/ -type f -exec mv {} {}.sample \; || false && \
     chmod 700 /startup.sh && \

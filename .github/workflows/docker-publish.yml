@@ -1,4 +1,4 @@
-name: Build Release
+name: Build Docker
 
 on:
   push:
@@ -10,21 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v4
-      with:
-        images: ${{ secrets.DOCKERHUB_USERNAME }}/barkbridge
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version-file: 'go.mod'
-    - name: Build
-      run: go build -o barkbridge main.go
-
-#     - name: Test
-#       run: go test -v ./...
-
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to DockerHub
@@ -32,11 +19,25 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ secrets.DOCKERHUB_USERNAME }}/nut
+        tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
     - name: Build and push
       uses: docker/build-push-action@v3
       id: docker_build
       with:
         context: .
+        platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}

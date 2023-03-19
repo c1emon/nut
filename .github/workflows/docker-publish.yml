@@ -29,9 +29,8 @@ jobs:
         images: ${{ secrets.DOCKERHUB_USERNAME }}/nut
         tags: |
             type=raw,enable=${{ inputs.branch == 'master' }},value=nightly
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=raw,enable=${{ startsWith(inputs.branch, 'v') }},value=${{ inputs.branch }}
+            type=raw,enable=${{ startsWith(inputs.branch, 'v') }},value=latest
     - name: Build and push
       uses: docker/build-push-action@v3
       id: docker_build

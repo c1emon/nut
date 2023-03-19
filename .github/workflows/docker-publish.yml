@@ -28,7 +28,7 @@ jobs:
       with:
         images: ${{ secrets.DOCKERHUB_USERNAME }}/nut
         tags: |
-            type=schedule,enable=${{ inputs.branch == 'master' }},pattern=nightly
+            type=raw,enable=${{ inputs.branch == 'master' }},value=nightly
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}

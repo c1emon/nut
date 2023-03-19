@@ -14,7 +14,7 @@ services:
       - GID=1000
     devices:
       - "/dev/ttyUSB0:/dev/ttyUSB0"
-    command: /nut/drivers/upsdrvctl -F -u nut start
+    command: /nut/drivers/upsdrvctl -F -u nut -g nut start
   upsd:
     image: clemon7/nut:nightly
     volumes:

@@ -2,29 +2,33 @@ version: "3"
 
 services:
   huawei-ups2000:
-    image: nut:latest
+    image: clemon7/nut:nightly
     volumes:
-      - "./run:/var/run/nut:rw"
       - "./conf:/etc/nut:ro"
+      - "./state:/var/run/nut:rw"
     environment:
-      # - NUT_CONFPATH=/etc/nut
+      - NUT_CONFPATH=/etc/nut
       - NUT_STATEPATH=/var/run/nut
-      - NUT_ALTPIDPATH=/var/run/nut
+      # - NUT_ALTPIDPATH=/var/run/nut
+      - UID=1000
+      - GID=1000
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
     command: upsdrvctl -F -u nut start
   upsd:
-    image: nut:latest
+    image: clemon7/nut:nightly
     volumes:
-      - "./run:/var/run/nut:rw"
       - "./conf:/etc/nut:ro"
+      - "./state:/var/run/nut:rw"
     ports:
       - "3493:3493/tcp"
     environment:
-      # - NUT_CONFPATH=/etc/nut
+      - NUT_CONFPATH=/etc/nut
       - NUT_STATEPATH=/var/run/nut
-      - NUT_ALTPIDPATH=/var/run/nut
+      # - NUT_ALTPIDPATH=/var/run/nut
       - UID=1000
       - GID=1000
-    command: /nut/upsd -F -u nut
+    command: upsd -F -u nut
     
 networks:
   default: {}

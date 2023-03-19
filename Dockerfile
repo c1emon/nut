@@ -17,12 +17,12 @@ FROM ubuntu:22.04
 
 WORKDIR /nut
 
-RUN apt update && apt -y install libmodbus5
-
 COPY --from=builder /nut/server server
 COPY --from=builder /nut/drivers drivers
 COPY --from=builder /nut/clients clients
 COPY entry.sh /nut/
+
+RUN apt update && apt -y install libmodbus5 && chmod +x /nut/entry.sh
 
 EXPOSE 3493
 

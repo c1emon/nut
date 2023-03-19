@@ -2,8 +2,7 @@ FROM ubuntu:22.04 as builder
 
 ARG BRANCH=master
 
-RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list && \
-    apt update && apt -y install git python3 curl build-essential automake libtool m4 autoconf libmodbus-dev
+RUN apt update && apt -y install git python3 curl build-essential automake libtool m4 autoconf libmodbus-dev
 
 RUN mkdir /nut && \
     git clone https://github.com/networkupstools/nut.git /nut && \

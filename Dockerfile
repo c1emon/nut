@@ -1,29 +1,30 @@
-FROM alpine:edge
+FROM ubuntu:22.04 as builder
 
-ARG BUILD_DATE
-ARG VCS_REF
-LABEL org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.schema-version="1.0" \
-    org.label-schema.description="This docker image implements Network UPS Tools (NUT) upsd daemon" \
-    org.label-schema.name=nut \
-    org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-url=https://github.com/c1emon/nut
+ARG BRANCH=master
 
-LABEL org.opencontainers.image.authors="cjw7360chen@gmail.com"
+RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list && \
+    apt update && apt -y install git python3 curl build-essential automake libtool m4 autoconf libmodbus-dev
 
-# 'nut' package is only available from testing branch -- add it to the repo list
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
-    apk update --allow-untrusted && apk upgrade --allow-untrusted && \
-    apk add --no-cache --allow-untrusted nut
+RUN mkdir /nut && \
+    git clone https://github.com/networkupstools/nut.git /nut && \
+    cd /nut && \
+    git checkout ${BRANCH} && \
+    ./autogen.sh && ./configure --with-serial=yes --with-modbus=yes --with-systemdsystemunitdir=no && make && \
+    rm -rf /nut/drivers/*.c /nut/drivers/*.h /nut/drivers/*.o /nut/drivers/*.am /nut/drivers/*.la /nut/drivers/*.lo /nut/drivers/Makefile* && \
+    rm -rf /nut/clients/*.c /nut/clients/*.h /nut/clients/*.o /nut/client/*.am /nut/clients/*.la /nut/clients/*.lo /nut/clients/Makefile* /nut/clients/*.cpp && \
+    rm -rf /nut/server/*.c /nut/server/*.h /nut/server/*.o /nut/server/*.am /nut/server/*.la /nut/server/*.lo /nut/server/Makefile*
 
-COPY startup.sh /startup.sh
+FROM ubuntu:22.04
 
-RUN [ -d /etc/nut ] && find /etc/nut/ -type f -exec mv {} {}.sample \; || false && \
-    chmod 700 /startup.sh && \
-    mkdir -p /var/run/nut && \
-    chown nut:nut /var/run/nut && \
-    chmod 700 /var/run/nut
+WORKDIR /nut
 
-ENTRYPOINT ["/startup.sh"]
+RUN apt update && apt -y install libmodbus5
+
+COPY --from=builder /nut/server server
+COPY --from=builder /nut/drivers drivers
+COPY --from=builder /nut/clients clients
+COPY entry.sh /nut/
 
 EXPOSE 3493
+
+ENTRYPOINT [ "/nut/entry.sh" ]

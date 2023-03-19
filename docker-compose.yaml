@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  huawei-ups2000:
+    image: nut:latest
+    volumes:
+      - "./run:/var/run/nut:rw"
+      - "./conf:/etc/nut:ro"
+    environment:
+      # - NUT_CONFPATH=/etc/nut
+      - NUT_STATEPATH=/var/run/nut
+      - NUT_ALTPIDPATH=/var/run/nut
+    command: upsdrvctl -F -u nut start
+  upsd:
+    image: nut:latest
+    volumes:
+      - "./run:/var/run/nut:rw"
+      - "./conf:/etc/nut:ro"
+    ports:
+      - "3493:3493/tcp"
+    environment:
+      # - NUT_CONFPATH=/etc/nut
+      - NUT_STATEPATH=/var/run/nut
+      - NUT_ALTPIDPATH=/var/run/nut
+      - UID=1000
+      - GID=1000
+    command: /nut/upsd -F -u nut
+    
+networks:
+  default: {}

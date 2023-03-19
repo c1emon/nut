@@ -34,6 +34,8 @@ else
     fi
 fi
 
+usermod -a -G dialout "${NUTUSER}"
+
 echo "UID=${UID};GID=${GID}"
 mkdir -p "${NUT_ALTPIDPATH}"
 echo "-1" > "${NUT_ALTPIDPATH}/upsd.pid"

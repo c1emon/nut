@@ -14,7 +14,7 @@ services:
       - GID=1000
     devices:
       - "/dev/ttyUSB0:/dev/ttyUSB0"
-    command: upsdrvctl -F -u nut start
+    command: /nut/drivers/upsdrvctl -F -u nut start
   upsd:
     image: clemon7/nut:nightly
     volumes:
@@ -28,7 +28,7 @@ services:
       # - NUT_ALTPIDPATH=/var/run/nut
       - UID=1000
       - GID=1000
-    command: upsd -F -u nut
+    command: /nut/server/upsd -F -u nut
     
 networks:
   default: {}

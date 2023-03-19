@@ -42,8 +42,5 @@ chown -R "${UID}:${GID}" "${NUTHOME}"
 chown -R "${UID}:${GID}" "${NUT_STATEPATH}"
 chown -R "${UID}:${GID}" "${NUT_ALTPIDPATH}"
 
-export PATH="${NUTHOME}/server:${NUTHOME}/drivers:${NUTHOME}/clients:$PATH"
-
-printf "Starting up %s ...\n" "$*"
-# exec "${NUTROOT}/server/upsd" -F -u "${NUTUSER}" "$*" || { printf "ERROR on upsd startup.\n"; exit; }
-exec "$*" || { printf "ERROR on startup.\n"; exit; }
+printf "Exce: %s\n" "$*"
+exec "$@" || { printf "ERROR on startup.\n"; exit; }

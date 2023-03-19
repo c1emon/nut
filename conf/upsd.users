@@ -1,0 +1,5 @@
+[admin]
+    password = cjw7360
+    actions = set
+    actions = fsd
+    instcmds = all

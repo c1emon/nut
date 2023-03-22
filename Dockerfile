@@ -1,11 +1,12 @@
 FROM ubuntu:22.04 as builder
 
 ARG BRANCH=master
+ARG REPO=https://github.com/networkupstools/nut.git
 
 RUN apt update && apt -y install git python3 curl build-essential automake libtool m4 autoconf libmodbus-dev
 
 RUN mkdir /nut && \
-    git clone https://github.com/networkupstools/nut.git /nut && \
+    git clone ${REPO} /nut && \
     cd /nut && \
     git checkout ${BRANCH} && \
     ./autogen.sh && ./configure --with-serial=yes --with-modbus=yes --with-systemdsystemunitdir=no && make && \

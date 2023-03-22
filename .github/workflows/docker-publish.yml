@@ -3,6 +3,10 @@ name: Build Docker
 on:
   workflow_dispatch:
     inputs:
+      repo:
+        description: 'nut repo'
+        required: true
+        default: 'https://github.com/networkupstools/nut.git'
       branch:
         description: 'nut branche name or tag'
         required: true
@@ -31,6 +35,7 @@ jobs:
             type=raw,enable=${{ inputs.branch == 'master' }},value=nightly
             type=raw,enable=${{ startsWith(inputs.branch, 'v') }},value=${{ inputs.branch }}
             type=raw,enable=${{ startsWith(inputs.branch, 'v') }},value=latest
+            type=raw,enable=${{ !startsWith(inputs.branch, 'v') && !(inputs.branch == 'master') }},value=${{ inputs.branch }}
     - name: Build and push
       uses: docker/build-push-action@v3
       id: docker_build
@@ -38,6 +43,7 @@ jobs:
         context: .
         build-args: |
           BRANCH=${{ inputs.branch }}
+          REPO=${{ inputs.repo }}
         platforms: linux/amd64,linux/arm64,linux/arm/v7
         push: true
         tags: ${{ steps.meta.outputs.tags }}
